@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gwent Tournament Hub - Witcher Arena</title>
+    <meta name="description" content="Онлайн-платформа для турнірів з Гвінту. Створюй колоду, обирай фракцію та перемагай найкращих відьмаків у турнірній сітці!">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="logo">
+            <div class="logo-icon">🐺</div>
+            <div class="logo-text">
+                <h1>Gwent Arena</h1>
+                <span>Турнірний Хаб</span>
+            </div>
+        </div>
+
+        <nav id="main-nav">
+            <a href="#tavern" class="nav-link active" data-target="section-tavern">Таверна</a>
+            <a href="#tournaments" class="nav-link" data-target="section-tournaments">Турніри</a>
+            <a href="#profile" class="nav-link" id="nav-link-profile" data-target="section-profile">Профіль</a>
+            <a href="#leaderboard" class="nav-link" data-target="section-leaderboard">Таблиця лідерів</a>
+        </nav>
+
+        <div class="user-status-widget">
+            <!-- Audio toggle -->
+            <div class="audio-control-widget" id="audio-toggle" onclick="APP.toggleAudio()">
+                <span id="audio-icon">🔇</span>
+                <span id="audio-label">Звук</span>
+            </div>
+
+            <!-- Login / Profile summary -->
+            <div id="user-auth-section">
+                <button class="btn btn-accent" onclick="APP.openAuthModal('login')">Вхід / Реєстрація</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main>
+
+        <!-- 1. TAVERN / LANDING PAGE -->
+        <section id="section-tavern" class="page-section active">
+            <div class="hero-banner">
+                <h2>Ласкаво просимо до Таверни, Друже!</h2>
+                <p>Тут збираються найкращі гравці Континенту, щоб розіграти партію в Гвінт. Створи свій профіль, обери фракцію та покажи Ґеральту з Рівії, хто тут справжній майстер карт!</p>
+                <div class="hero-actions">
+                    <button class="btn btn-accent pulsing" onclick="APP.openQuickPlayModal()">Швидка гра з ботом ⚔️</button>
+                    <button class="btn btn-secondary" onclick="APP.navigateToSection('section-tournaments')">Турнірний Зал 🏆</button>
+                    <button class="btn btn-secondary" onclick="APP.navigateToSection('section-profile')">Налаштувати Колоду 🎴</button>
+                </div>
+            </div>
+
+            <div class="tavern-content">
+                <!-- Left column: Active tournaments -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Активні та майбутні змагання</h2>
+                        <span class="text-muted">Турніри на виліт</span>
+                    </div>
+                    <div class="tournament-grid" id="tavern-tournaments-list">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+
+                <!-- Right column: Witcher lore / stats -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Арена в цифрах</h2>
+                    </div>
+                    <div class="stat-box-container" style="grid-template-columns: 1fr; gap: 15px;">
+                        <div class="stat-box">
+                            <div class="stat-box-value" id="stats-total-players">0</div>
+                            <div class="stat-box-label">Гравців зареєстровано</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-box-value" id="stats-active-tournaments">0</div>
+                            <div class="stat-box-label">Турнірів проведено</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-box-value" id="stats-total-matches">0</div>
+                            <div class="stat-box-label">Зіграно партій</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 2. TOURNAMENTS HUB -->
+        <section id="section-tournaments" class="page-section">
+            <div class="panel" id="tournaments-list-view">
+                <div class="panel-header">
+                    <h2>Турнірний Зал</h2>
+                    <button class="btn btn-accent" id="btn-create-tournament" onclick="APP.createNewTournament()">Створити новий турнір</button>
+                </div>
+                <p class="text-muted" style="margin-bottom: 20px;">Оберіть активний турнір для перегляду сітки або запишіться на наступні змагання.</p>
+                <div class="tournament-grid" id="main-tournaments-list">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+
+            <!-- Detail Tournament & Bracket View -->
+            <div class="panel" id="tournament-detail-view" style="display: none;">
+                <div class="panel-header tournament-header-panel">
+                    <div>
+                        <button class="btn btn-secondary" onclick="APP.showTournamentsList()" style="padding: 6px 12px; margin-bottom: 10px; font-size: 0.8rem;">← Назад до списку</button>
+                        <h2 id="active-tournament-title">Турнір</h2>
+                        <div class="tournament-meta" style="margin-top: 5px;">
+                            <span>Статус: <strong id="active-tournament-status">-</strong></span>
+                            <span>Призовий фонд: <strong id="active-tournament-prize">-</strong></span>
+                        </div>
+                    </div>
+                    <div id="tournament-actions-container">
+                        <!-- Join button / Simulation speed -->
+                    </div>
+                </div>
+
+                <!-- Bracket container -->
+                <div style="margin-top: 30px;">
+                    <h3>Турнірна Сітка</h3>
+                    <div id="bracket-container" style="margin-top: 15px;">
+                        <!-- Rendered by bracket.js -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 3. PLAYER PROFILE -->
+        <section id="section-profile" class="page-section">
+            <div id="profile-unauthenticated-msg" class="panel text-center" style="padding: 60px; text-align: center;">
+                <h2>Необхідна авторизація</h2>
+                <p class="text-muted" style="margin: 15px 0 25px 0;">Будь ласка, увійдіть або зареєструйтесь, щоб керувати своїм профілем, обирати фракції та створювати колоди.</p>
+                <button class="btn btn-accent" onclick="APP.openAuthModal('login')">Авторизуватися</button>
+            </div>
+
+            <div class="profile-grid" id="profile-authenticated-view" style="display: none;">
+                <!-- Left column: User Card -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Мій Профіль</h2>
+                    </div>
+                    
+                    <div style="text-align: center; margin-bottom: 25px;">
+                        <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2.5rem; margin: 0 auto 15px auto;" id="profile-avatar">🐺</div>
+                        <h3 id="profile-username" style="font-size: 1.5rem;">Відьмак</h3>
+                        <p id="profile-faction-name" style="color: var(--gold); text-transform: uppercase; font-size: 0.85rem; font-weight: 700; letter-spacing: 1px;">Королівства Півночі</p>
+                    </div>
+
+                    <div class="stat-box-container" style="grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 25px;">
+                        <div class="stat-box" style="padding: 10px;">
+                            <div class="stat-box-value" id="profile-stat-mmr" style="font-size: 1.5rem;">1000</div>
+                            <div class="stat-box-label" style="font-size: 0.7rem;">Рейтинг MMR</div>
+                        </div>
+                        <div class="stat-box" style="padding: 10px;">
+                            <div class="stat-box-value" id="profile-stat-wins" style="font-size: 1.5rem;">0</div>
+                            <div class="stat-box-label" style="font-size: 0.7rem;">Перемоги</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profile-select-faction">Змінити фракцію</label>
+                        <select id="profile-select-faction" onchange="APP.changeUserFaction(this.value)">
+                            <option value="realms">Королівства Півночі 🦅</option>
+                            <option value="nilfgaard">Нільфгаард ☀️</option>
+                            <option value="monsters">Монстри 🐉</option>
+                            <option value="scoiatael">Скоя'таелі 🏹</option>
+                            <option value="skellige">Скелліге ⛵</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-danger" style="width: 100%; margin-top: 20px;" onclick="APP.logout()">Вийти з аккаунту</button>
+                </div>
+
+                <!-- Right column: Deck builder -->
+                <div class="deck-builder-panel">
+                    <div class="panel-header">
+                        <h2>Конструктор колоди</h2>
+                        <span class="text-muted" id="deck-builder-faction-label">Фракційні карти</span>
+                    </div>
+
+                    <div class="deck-status-bar">
+                        <div>Всього карт: <strong id="deck-count-total">0/15</strong></div>
+                        <div>Сила загонів: <strong id="deck-average-power">0⚔️</strong></div>
+                    </div>
+
+                    <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 15px;">Ваша колода автоматично формується з фракційних та нейтральних карт. Натисніть на карту, щоб переглянути деталі.</p>
+                    
+                    <div class="deck-cards-pool" id="deck-cards-container">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 4. LEADERBOARD -->
+        <section id="section-leaderboard" class="page-section">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Турнірна Таблиця Континенту</h2>
+                    <span class="text-muted">Загальний рейтинг MMR</span>
+                </div>
+                
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">Ранг</th>
+                            <th>Гравець</th>
+                            <th>Фракція</th>
+                            <th style="text-align: right; width: 120px;">MMR</th>
+                            <th style="text-align: right; width: 100px;">Перемоги</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-tbody">
+                        <!-- Filled by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+
+        <!-- 5. ACTIVE GWENT BATTLE BOARD -->
+        <section id="section-match-board" class="page-section">
+            <div class="panel" style="padding: 20px; border-color: var(--gold);">
+                <div class="panel-header" style="margin-bottom: 15px;">
+                    <h2>Поле битви (Гвінт)</h2>
+                    <button class="btn btn-danger" onclick="APP.surrenderMatch()" style="padding: 6px 12px; font-size: 0.8rem;">Здатися</button>
+                </div>
+                
+                <div id="gwent-board-container">
+                    <!-- Rendered by game-simulator.js -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2026 Gwent Tournament Arena. Створено з повагою до творчості Анджея Сапковського та CD Projekt Red.</p>
+    </footer>
+
+    <!-- AUTHENTICATION MODAL -->
+    <div class="modal-overlay" id="auth-modal">
+        <div class="modal-content">
+            <button class="modal-close-btn" onclick="APP.closeAuthModal()">×</button>
+            <div class="modal-tabs">
+                <div class="modal-tab active" id="tab-login" onclick="APP.switchAuthTab('login')">Вхід</div>
+                <div class="modal-tab" id="tab-register" onclick="APP.switchAuthTab('register')">Реєстрація</div>
+            </div>
+
+            <!-- Login form -->
+            <form id="form-login" onsubmit="APP.handleAuthSubmit(event, 'login')">
+                <div class="form-group">
+                    <label for="login-username">Ім'я гравця</label>
+                    <input type="text" id="login-username" required placeholder="Введіть нікнейм">
+                </div>
+                <button type="submit" class="btn btn-accent" style="width: 100%; margin-top: 10px;">Увійти</button>
+            </form>
+
+            <!-- Register form -->
+            <form id="form-register" onsubmit="APP.handleAuthSubmit(event, 'register')" style="display: none;">
+                <div class="form-group">
+                    <label for="register-username">Нікнейм гравця</label>
+                    <input type="text" id="register-username" required placeholder="Наприклад: Geralt_Kyiv">
+                </div>
+                <div class="form-group">
+                    <label for="register-faction">Вибір фракції</label>
+                    <select id="register-faction" required>
+                        <option value="realms">Королівства Півночі 🦅</option>
+                        <option value="nilfgaard">Нільфгаард ☀️</option>
+                        <option value="monsters">Монстри 🐉</option>
+                        <option value="scoiatael">Скоя'таелі 🏹</option>
+                        <option value="skellige">Скелліге ⛵</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-accent" style="width: 100%; margin-top: 10px;">Зареєструватись</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- QUICK PLAY MODAL -->
+    <div class="modal-overlay" id="quickplay-modal">
+        <div class="modal-content">
+            <button class="modal-close-btn" onclick="APP.closeQuickPlayModal()">×</button>
+            <h2 style="margin-bottom: 20px; text-align: center;">⚔️ Швидка гра з ботом</h2>
+            <form id="form-quickplay" onsubmit="APP.handleQuickPlaySubmit(event)">
+                <div class="form-group">
+                    <label for="quickplay-opponent">Оберіть суперника</label>
+                    <select id="quickplay-opponent" required onchange="APP.updateQuickPlayFactionSelect(this.value)">
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="quickplay-faction">Фракція суперника</label>
+                    <select id="quickplay-faction" required>
+                        <option value="realms">Королівства Півночі 🦅</option>
+                        <option value="nilfgaard">Нільфгаард ☀️</option>
+                        <option value="monsters">Монстри 🐉</option>
+                        <option value="scoiatael">Скоя'таелі 🏹</option>
+                        <option value="skellige">Скелліге ⛵</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-accent pulsing" style="width: 100%; margin-top: 15px;">Розпочати бій</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- CUSTOM BRACKET MODAL (PARTICIPANT SELECTOR) -->
+    <div class="modal-overlay" id="custom-bracket-modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <button class="modal-close-btn" onclick="APP.closeCustomBracketModal()">×</button>
+            <h2 style="margin-bottom: 10px; text-align: center;">🏆 Створення турнірної сітки</h2>
+            <p class="text-muted" style="text-align: center; font-size: 0.85rem; margin-bottom: 20px;">Оберіть рівно 8 гравців для участі у турнірі.</p>
+            
+            <div id="bracket-player-selector-grid" class="bracket-selector-grid" style="max-height: 300px; overflow-y: auto; margin-bottom: 20px; border: 1px solid var(--border-metal); border-radius: 4px; padding: 10px;">
+                <!-- Populated by JS (checkboxes) -->
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <span id="bracket-selected-count" style="font-family: var(--font-header); color: var(--gold); font-weight:700;">Обрано: 0 з 8 гравців</span>
+                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="APP.autoFillBracketPlayers()">Заповнити авто</button>
+            </div>
+
+            <button id="btn-generate-bracket-submit" class="btn btn-accent" style="width: 100%;" disabled onclick="APP.submitCustomBracket()">Згенерувати сітку</button>
+        </div>
+    </div>
+
+    <!-- CARD DETAILS MODAL -->
+    <div class="modal-overlay" id="card-details-modal" onclick="APP.closeCardDetailsModal()">
+        <div class="modal-content card-detail-modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close-btn" onclick="APP.closeCardDetailsModal()">×</button>
+            <div class="card-detail-layout" id="card-details-content">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="gwent-cards.js"></script>
+    <script src="bracket.js"></script>
+    <script src="game-simulator.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
