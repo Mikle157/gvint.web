@@ -1,0 +1,15 @@
+{
+  "name": "gwent-tournament-platform",
+  "version": "1.0.0",
+  "description": "Online tournament platform for Gwent with Witcher fantasy theme",
+  "main": "app.js",
+  "scripts": {
+    "start": "npx http-server -p 8080"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "author": "Antigravity",
+  "license": "MIT"
+}
